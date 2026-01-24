@@ -56,13 +56,13 @@ function get_all_group_names_for_uid() {
   local user_info=$(cat /etc/passwd | grep $USER_ID)
   local username=$(echo "$user_info"| cut -d ':' -f 1)
   local group_infos=$(cat /etc/group | grep "$username")
-
+ 
   # Collect all group names
   local all_group_names=""
-  for group_info in ${group_infos}; do
-    all_group_names+="$(echo $group_info | cut -d ':' -f 1) "
-  done
-
+	for group_info in ${group_infos}; do
+	  all_group_names+="$(echo $group_info | cut -d ':' -f 1) "
+	done
+  
   echo "${all_group_names}"
   return 0
 }
@@ -72,38 +72,38 @@ function get_all_group_names_for_uid() {
 # -------------------------------------------------
 
 function print_profile_for_uid() {
-  local USER_ID=${1}
-  local FULL_NAME=$(get_full_name_for_uid ${USER_ID})
-  local USER_NAME=$(get_user_name_for_uid ${USER_ID})
-  local PRIMARY_GID=$(get_primary_gid_for_uid ${USER_ID})
-  local PRIMARY_GROUP_NAME=$(get_group_name_for_gid ${PRIMARY_GID})
-  local ALL_GROUP_NAMES=$(get_all_group_names_for_uid ${USER_ID})
+	local USER_ID=${1}
+	local FULL_NAME=$(get_full_name_for_uid ${USER_ID})
+	local USER_NAME=$(get_user_name_for_uid ${USER_ID})
+	local PRIMARY_GID=$(get_primary_gid_for_uid ${USER_ID})
+	local PRIMARY_GROUP_NAME=$(get_group_name_for_gid ${PRIMARY_GID})
+	local ALL_GROUP_NAMES=$(get_all_group_names_for_uid ${USER_ID})
 
-  local OTHER_GROUP_NAMES=""
-  for GROUP_NAME in ${ALL_GROUP_NAMES}; do
-    if [ "${GROUP_NAME}" != "${PRIMARY_GROUP_NAME}" ]; then
-      OTHER_GROUP_NAMES+="${GROUP_NAME}, "
-    fi
-  done
+	local OTHER_GROUP_NAMES=""
+	for GROUP_NAME in ${ALL_GROUP_NAMES}; do
+		if [ "${GROUP_NAME}" != "${PRIMARY_GROUP_NAME}" ]; then
+			OTHER_GROUP_NAMES+="${GROUP_NAME}, "
+		fi
+	done
 
-  if [ ${#OTHER_GROUP_NAMES} -ge 2 ]; then
-    OTHER_GROUP_NAMES=${OTHER_GROUP_NAMES:0:-2}
-  fi
+	if [ ${#OTHER_GROUP_NAMES} -ge 2 ]; then
+		OTHER_GROUP_NAMES=${OTHER_GROUP_NAMES:0:-2}
+	fi
 
-  local PROFILE_OUTPUT="
+	local PROFILE_OUTPUT="
 ------------------- [ ${USER_ID} ] ---------------------
  User: ${FULL_NAME:-[unnamed]} (${USER_NAME})
  Primary Group: ${PRIMARY_GROUP_NAME} (${PRIMARY_GID})
  Other Groups: ${OTHER_GROUP_NAMES:-[none]}
 ----------------------------------------------$(printf -- '-%.0s' $(seq 1 ${#USER_ID}))
 "
-  echo "${PROFILE_OUTPUT}"
+	echo "${PROFILE_OUTPUT}"
 }
 
 USER_ID=${1}
 if ! [[ "${USER_ID}" =~ ^[0-9]+$ ]] || ! id -nu "${USER_ID}" > /dev/null; then
-  >&2 echo "Please provide a valid UID as the first argument."
-  exit 1
+	>&2 echo "Please provide a valid UID as the first argument."
+	exit 1
 fi
 
 print_profile_for_uid ${USER_ID}
